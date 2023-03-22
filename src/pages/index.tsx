@@ -166,10 +166,11 @@ export default function Home() {
                 })}
               </div>
             </div>
-            <div className={styles.center}>
-              <div className={styles.cloudform}>
-                <form onSubmit={handleSubmit}>
+            <div className="flex justify-center items-center relative py-8 flex-col">
+              <div className="w-full h-full overflow-y-scroll rounded-md">
+                <form className="w-96" onSubmit={handleSubmit}>
                   <textarea
+                    className="relative resize-none text-lg w-96 rounded-md border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-blue-600 focus:shadow-outline-blue disabled:opacity-50"
                     disabled={loading}
                     onKeyDown={handleEnter}
                     ref={textAreaRef}
@@ -185,7 +186,7 @@ export default function Home() {
                     }
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className={styles.textarea}
+                    //className={styles.textarea}
                   />
                   <button
                     type="submit"

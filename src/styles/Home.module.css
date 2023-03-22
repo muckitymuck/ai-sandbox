@@ -18,7 +18,7 @@
     position: relative;
   }
   
-  .textarea {
+  /* .textarea {
     position: relative;
     resize: none;
     font-size: 1.1rem;
@@ -43,7 +43,9 @@
   
   .textarea::placeholder {
     color: #6b7280;
-  }
+  } */
+
+
   
   .generatebutton {
     position: absolute;
@@ -80,13 +82,13 @@
     background: none;
   }
   
-  .messagelist {
+  /* .messagelist {
     width: 100%;
     height: 100%;
     overflow-y: scroll;
     border-radius: 0.5rem;
   }
-  
+   */
   .messagelistloading {
     display: flex;
     width: 100%;
@@ -179,14 +181,14 @@
     font-size: inherit;
   }
   
-  .center {
+  /* .center {
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     padding: 2rem 0;
     flex-direction: column;
-  }
+  } */
   
   .cloud {
     width: 75vw;
