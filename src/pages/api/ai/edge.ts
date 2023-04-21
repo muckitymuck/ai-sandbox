@@ -9,7 +9,7 @@ const handler = async (req: Request): Promise<Response> => {
   //     prompt?: string;
   //   };
 
-  const prompt = "tell me a 100 word story about a cat";
+  const prompt = "tell me a 10 word story about a cat";
 
   const payload = {
     model: "text-davinci-003",

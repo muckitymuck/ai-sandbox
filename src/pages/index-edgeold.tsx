@@ -44,144 +44,85 @@ const InputSection = ({ setIsLoading, setConversation, conversation }
       inputElement.current.focus();
     }
   }, []);
-        // **** Changed this to the Twitter Bio type ****
-        // https://github.com/Nutlope/twitterbio/blob/main/pages/index.tsx
-  // const handleSubmit = async (e: any) => {
-  //   e.preventDefault();
 
-  //   if (!query) {
-  //     alert('Please input a question');
-  //     return;
-  //   }
-
-  //   const question = query.trim();
-
-  //   setConversation((state) => ({
-  //     ...state,
-  //     messages: [
-  //       ...state.messages,
-  //       {
-  //         type: 'userMessage',
-  //         message: question,
-  //       },
-  //     ],
-  //   }));
-
-
-  //   setIsLoading(true);
-  //   setQuery('');
-
-  //   const ctrl = new AbortController();
-  //   console.log('question', question)
-  //   try {
-  //     //fetchEventSource('/api/ai/emp-hbk-stream', {
-  //     fetchEventSource('/api/ai/edge', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         question,
-  //         history: conversation.history,
-  //       }),
-  //        signal: ctrl.signal,
-
-
-        // Handle Message Event START
-        // onmessage: (event) => {
-        //   if (event.data === '[END STREAM]') {
-        //     setConversation((state) => ({
-        //       history: [...state.history, `User: ${question}`, `Treace Bot: ${state.pending ?? ''}`],
-        //       messages: [
-        //         ...state.messages,
-        //         {
-        //           type: 'apiMessage',
-        //           message: state.pending ?? '',
-        //         },
-        //       ],
-        //       pending: undefined,
-        //     }));
-        //     setIsLoading(false);
-        //     ctrl.abort();
-        //   } else {
-        //     const data = event.data;
-        //     setConversation((state) => ({
-        //       ...state,
-        //       //Changed from this to the messages array
-        //       //pending: (state.pending ?? '') + data,
-        //       messages: [
-        //         ...state.messages,
-        //         {
-        //           type: 'apiMessage',
-        //           message: data,
-        //         }
-        //       ]
-        //     }));
-        //   }
-        // },
-        // Handle Message Event END
-  //     });
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     console.log('error', error);
-  //   }
-  // }
-
-  const handleSubmit = async (e) => {
-  //const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const question = query.trim();
-    setIsLoading(true);
-    setConversation((state) => ({
-      ...state,
-      messages: [
-        ...state.messages,
-        {
-          type: 'userMessage',
-          message: query,
-        },
-      ],
-    }))
 
     if (!query) {
       alert('Please input a question');
       return;
     }
 
-    const response = await fetch('/api/ai/edge', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        question,
-        history: conversation.history,
-      }),
-    })
+    const question = query.trim();
 
-    if (!response.ok){
-      throw new Error(response.statusText);
-    }
-    // This data is a ReadableStream
-    const data = response.body;
-    if(!data) {
-      return;
-    }
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
+    setConversation((state) => ({
+      ...state,
+      messages: [
+        ...state.messages,
+        {
+          type: 'userMessage',
+          message: question,
+        },
+      ],
+    }));
 
-    while (!done) {
-      
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      setConversation((state) => state + chunkValue)    
+
+    setIsLoading(true);
+    setQuery('');
+
+    const ctrl = new AbortController();
+    console.log('question', question)
+    try {
+      //fetchEventSource('/api/ai/emp-hbk-stream', {
+      fetchEventSource('/api/ai/edge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          history: conversation.history,
+        }),
+        signal: ctrl.signal,
+        // Handle Message Event START
+        onmessage: (event) => {
+          if (event.data === '[END STREAM]') {
+            setConversation((state) => ({
+              history: [...state.history, `User: ${question}`, `Treace Bot: ${state.pending ?? ''}`],
+              messages: [
+                ...state.messages,
+                {
+                  type: 'apiMessage',
+                  message: state.pending ?? '',
+                },
+              ],
+              pending: undefined,
+            }));
+            setIsLoading(false);
+            ctrl.abort();
+          } else {
+            const data = event.data;
+            setConversation((state) => ({
+              ...state,
+              //Changed from this to the messages array
+              //pending: (state.pending ?? '') + data,
+              messages: [
+                ...state.messages,
+                {
+                  type: 'apiMessage',
+                  message: data,
+                }
+              ]
+            }));
+          }
+        },
+        // Handle Message Event END
+      });
+    } catch (error) {
+      setIsLoading(false);
+      console.log('error', error);
     }
-    setIsLoading(false);
   }
-
-
 
   return (
     <form>
@@ -214,7 +155,7 @@ const Layout = ({ children }) => {
 }
 
 const Component = ({ access }) => {
-  const [conversation, setConversation] = useState({ messages: [], history: [], pending: [] })
+  const [conversation, setConversation] = useState({ messages: [], history: [], pending: undefined })
   const [isLoading, setIsLoading] = useState(false)
   const user = useUser()
 
@@ -237,11 +178,6 @@ const Component = ({ access }) => {
   // if (!access) {
   //   return <div className='text-2xl p-12'>Access Denied</div>
   // }
-  interface ConversationProps {
-    messages: { type: string; image: string}[];
-    history?: any[];
-    pending?: any;
-  }
 
   return (
     <>
@@ -253,10 +189,7 @@ const Component = ({ access }) => {
             <MessagesSection>
               <PulseLoader color="#808080" size={7} className="pl-3" loading={isLoading && !conversation.pending} />
               {conversation.pending && <Message type='apiMessage'> {conversation.pending} </Message>}
-              {/* {conversation && conversation.messages.slice(0).reverse().map((message: any, index) => ( */}
-              {conversation && conversation?.messages?.map((message, index) => (
-              
-                // <Message key={index} type={message.type} image={message.image}> {message.message} </Message>
+              {conversation && conversation.messages.slice(0).reverse().map((message: any, index) => (
                 <Message key={index} type={message.type} image={message.image}> {message.message} </Message>
               ))}
             </MessagesSection>
